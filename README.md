@@ -28,7 +28,8 @@ Build instructions
 
 4. Build the project:
 
-		cd ../examples
+		mkdir build
+		cd build
 		cmake -DEM_MCU=EFM32ZG222F32 -DCMAKE_TOOLCHAIN_FILE=../gcc_cortex_m.cmake \
 		-DCMAKE_BUILD_TYPE=Debug -DTOOLCHAIN_PREFIX=<path_to_toolchain> \
 		-DENMICRO_DIR=<path_to_energymicro_bundle> ../apps
