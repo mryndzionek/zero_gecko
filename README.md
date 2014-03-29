@@ -41,15 +41,15 @@ Every `<target>` has also an `upload_<target>` using `start-eACommander.sh` to u
 Examples description
 --------------------
 
-* energymicro blink example
+* __energymicro blink example__
 
 ![blink_eap](images/blink_eap.png?raw=true "Energy aware profiler - blink example")
 
-* QP-nano EM3 mode blink example
+* __QP-nano EM3 mode blink example__
 
 ![blink_qpn_eap](images/blink_qpn_eap.png?raw=true "Energy aware profiler - blink QP-nano example")
 
-* energymicro emlcd example
+* __energymicro emlcd example__
 
 ![emlcd](images/emlcd_eap.png?raw=true "Energy aware profiler - emlcd example")
 
