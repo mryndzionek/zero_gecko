@@ -15,7 +15,7 @@ Build instructions
 
 		git clone https://github.com/mryndzionek/zero_gecko.git
 
-2. Download the CodeSourcery Toolchain
+2. Download the ARM toolchain from [here](https://launchpad.net/gcc-arm-embedded/4.7/4.7-2012-q4-major)
 
 3. Build emlib library:
 
