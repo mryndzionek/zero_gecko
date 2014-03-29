@@ -38,6 +38,21 @@ Build instructions
 
 Every `<target>` has also an `upload_<target>` using `start-eACommander.sh` to upload the binary to the starter kit.
 
+Examples description
+--------------------
+
+* energymicro blink example
+
+![blink_eap](images/blink_eap.png?raw=true "Energy aware profiler - blink example")
+
+* QP-nano EM3 mode blink example
+
+![blink_qpn_eap](images/blink_qpn_eap.png?raw=true "Energy aware profiler - blink QP-nano example")
+
+* energymicro emlcd example
+
+![emlcd](images/emlcd_eap.png?raw=true "Energy aware profiler - emlcd example")
+
 Contact
 -------
 If you have questions, contact Mariusz Ryndzionek at:
