@@ -17,7 +17,9 @@ Build instructions
 
 2. Download the ARM toolchain from [here](https://launchpad.net/gcc-arm-embedded/4.7/4.7-2012-q4-major)
 
-3. Build emlib library:
+3. Download the QP-nano framework (5.2.0) from [here](http://sourceforge.net/projects/qpc/files/QP-nano/5.2.0/) and unpack it into `qpn_5.2.0` subdirectory
+
+4. Build emlib library:
 
 		cd emlib
 		cmake -DCMAKE_TOOLCHAIN_FILE=../gcc_cortex_m.cmake -DTOOLCHAIN_PREFIX=<path_to_toolchain> \
@@ -26,7 +28,7 @@ Build instructions
 		make -j<n>
 		make install
 
-4. Build the project:
+5. Build the project:
 
 		mkdir build
 		cd build
