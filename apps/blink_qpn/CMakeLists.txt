@@ -1,0 +1,10 @@
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/../qpn_5.2.0/include")
+ADD_EFM32_EXECUTABLE(
+	blink_qpn 
+	main.c 
+	blink.c
+	bsp.c
+    ${CMAKE_SOURCE_DIR}/../qpn_5.2.0/source/qepn.c
+    ${CMAKE_SOURCE_DIR}/../qpn_5.2.0/source/qfn.c
+)
