@@ -34,7 +34,7 @@ SET(CMAKE_C_FLAGS_RELEASE "-O2" CACHE INTERNAL "c release compiler flags")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE INTERNAL "cxx release compiler flags")
 SET(CMAKE_ASM_FLAGS_RELEASE "" CACHE INTERNAL "asm release compiler flags")
 
-SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -mthumb" CACHE INTERNAL "exe link flags")
+SET(CMAKE_EXE_LINKER_FLAGS "--specs=nano.specs -Wl,--gc-sections -mthumb -Wl,--start-group -lgcc -lc_s -lnosys   -Wl,--end-group" CACHE INTERNAL "exe link flags")
 SET(CMAKE_MODULE_LINKER_FLAGS "-L${TOOLCHAIN_LIB_DIR}" CACHE INTERNAL "module link flags")
 SET(CMAKE_SHARED_LINKER_FLAGS "-L${TOOLCHAIN_LIB_DIR}" CACHE INTERNAL "shared link flags")
 

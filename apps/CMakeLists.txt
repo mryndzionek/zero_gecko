@@ -2,6 +2,9 @@ PROJECT(zero-gecko)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 ENABLE_LANGUAGE(ASM)
+
+SET(CMAKE_EXE_LINKER_FLAGS "--specs=nano.specs -Wl,--gc-sections -mthumb" CACHE INTERNAL "exe link flags")
+
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 	"../cmake/Modules/")
 
@@ -27,7 +30,8 @@ INCLUDE_DIRECTORIES(
 )
 
 FILE(GLOB BSP_SOURCES
-    "${ENMICRO_DIR}/kits/common/bsp/*.c"
+    "${ENMICRO_DIR}/kits/common/bsp/bsp_bcc.c"
+    "${ENMICRO_DIR}/kits/common/bsp/bsp_stk*.c"
 )
 
 FUNCTION(ADD_EFM32_EXECUTABLE EXECUTABLE_NAME)
@@ -37,7 +41,7 @@ FUNCTION(ADD_EFM32_EXECUTABLE EXECUTABLE_NAME)
 	ADD_EXECUTABLE(${elf_file} ${ARGN} ${BSP_SOURCES} 
 		${EMLIB_SYSTEM_SOURCE} ${EMLIB_STARTUP_SOURCE})
 
-	TARGET_LINK_LIBRARIES(${elf_file} ${EMLIB_LIBRARIES})
+	TARGET_LINK_LIBRARIES(${elf_file} ${EMLIB_LIBRARIES} -Wl,--start-group -lgcc -lc_s -lnosys   -Wl,--end-group)
 
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${lst_file}
@@ -52,9 +56,11 @@ FUNCTION(ADD_EFM32_EXECUTABLE EXECUTABLE_NAME)
     ADD_CUSTOM_TARGET(
         upload_${EXECUTABLE_NAME}
         ${EACOMMANDER} --flash ${bin_file}
-        DEPENDS ${bin_file}
+        DEPENDS ${bin_file} ${elf_file} ${lst_file}
         COMMENT "Uploading ${bin_file}"
     )
 ENDFUNCTION(ADD_EFM32_EXECUTABLE)
 
 ADD_SUBDIRECTORY(blink)
+ADD_SUBDIRECTORY(blink_qpn)
+ADD_SUBDIRECTORY(emlcd)
