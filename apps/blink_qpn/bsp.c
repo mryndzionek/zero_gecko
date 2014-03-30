@@ -88,7 +88,7 @@ void QF_onIdle(void) {        /* entered with interrupts LOCKED, see NOTE01 */
 
     BSP_LedSet(1);
     BSP_LedClear(1);
-    EMU_EnterEM3(true);
+    EMU_EnterEM2(true);
     QF_INT_ENABLE();
 
 }

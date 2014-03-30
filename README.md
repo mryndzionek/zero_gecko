@@ -45,7 +45,7 @@ Examples description
 
 ![blink_eap](images/blink_eap.png?raw=true "Energy aware profiler - blink example")
 
-* __QP-nano EM3 mode blink example__
+* __QP-nano EM2 mode blink example__
 
 ![blink_qpn_eap](images/blink_qpn_eap.png?raw=true "Energy aware profiler - blink QP-nano example")
 
