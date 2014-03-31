@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="3.0.1">
+ <framework name="qpn"/>
+ <package name="AOs" stereotype="0x02">
+  <class name="Display" superclass="qpn::QMActive">
+   <statechart>
+    <initial target="../1">
+     <initial_glyph conn="3,3,5,0,15,3">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="IDLE">
+     <entry>BSP_ledOff();
+QActive_arm((QActive *)me, IDLE_TOUT);</entry>
+     <exit>QActive_disarm((QActive *)me);</exit>
+     <tran trig="Q_TIMEOUT" target="../../2">
+      <tran_glyph conn="6,14,3,1,53">
+       <action box="0,-2,11,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="6,6,19,15">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state name="SCROLLING">
+     <entry>BSP_ledOn();
+BSP_drawPicture();
+QActive_arm((QActive *)me, SCROLLING_TOUT);</entry>
+     <exit>QActive_disarm((QActive *)me);</exit>
+     <tran trig="Q_TIMEOUT" target="../../1">
+      <tran_glyph conn="59,17,1,3,-53">
+       <action box="-9,-2,11,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="38,6,21,15">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="67,29"/>
+   </statechart>
+  </class>
+  <attribute name="AO_Display" type="QMActive *const" visibility="0x00" properties="0x00"/>
+  <operation name="Display_ctor" type="void" visibility="0x00" properties="0x00">
+   <documentation>constructor</documentation>
+   <code>QMActive_ctor(&amp;AO_Display.super, Q_STATE_CAST(&amp;Display_initial));</code>
+  </operation>
+  <directory name=".">
+   <file name="display_test.h">
+    <text>#ifndef __DISPLAY_TEST_H__
+#define __DISPLAY_TEST_H__
+
+// active objects ................................................*/
+$declare(AOs::Display_ctor)
+
+extern struct DisplayTag AO_Display;
+
+#endif /* __DISPLAY_TEST_H__ */</text>
+   </file>
+   <file name="display_test.c">
+    <text>#include &quot;qpn_port.h&quot;
+#include &quot;bsp_.h&quot;
+#include &quot;display_test.h&quot;
+
+/*Q_DEFINE_THIS_FILE*/
+
+#define SCROLLING_TOUT BSP_TICKS_PER_SEC
+#define IDLE_TOUT BSP_TICKS_PER_SEC
+
+/* Pelican class declaration -----------------------------------------------*/
+$declare(AOs::Display)
+
+/* Global objects ----------------------------------------------------------*/
+Display AO_Display;     /* the single instance of the Display active object */
+
+/* Blink class definition --------------------------------------------------*/
+$define(AOs::Display_ctor)
+$define(AOs::Display)</text>
+   </file>
+   <file name="main.c">
+    <text>#include &quot;qpn_port.h&quot;   /* QP-nano port */
+#include &quot;bsp_.h&quot;        /* Board Support Package (BSP) */
+#include &quot;display_test.h&quot;      /* application interface */
+/*..........................................................................*/
+static QEvt l_displayQueue[1];
+
+/* QF_active[] array defines all active object control blocks --------------*/
+QActiveCB const Q_ROM Q_ROM_VAR QF_active[] = {
+    { (QActive *)0,           (QEvt *)0,      0                     },
+    { (QActive *)&amp;AO_Display,   l_displayQueue, Q_DIM(l_displayQueue)     }
+};
+
+/* make sure that the QF_active[] array matches QF_MAX_ACTIVE in qpn_port.h */
+Q_ASSERT_COMPILE(QF_MAX_ACTIVE == Q_DIM(QF_active) - 1);
+
+/*..........................................................................*/
+int main(void)
+{
+    Display_ctor();    /* instantiate the Display AO */
+    BSP_init();      /* initialize the board */
+
+    return QF_run(); /* transfer control to QF-nano */
+}</text>
+   </file>
+  </directory>
+ </package>
+</model>
