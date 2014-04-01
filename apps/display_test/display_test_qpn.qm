@@ -5,52 +5,73 @@
   <class name="Display" superclass="qpn::QMActive">
    <statechart>
     <initial target="../1">
-     <initial_glyph conn="3,3,5,0,15,3">
+     <initial_glyph conn="5,5,5,0,28,4">
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
-    <state name="IDLE">
-     <entry>BSP_ledOff();
+    <state name="DEMO">
+     <initial target="../1">
+      <initial_glyph conn="15,13,5,0,10,2">
+       <action box="0,-2,6,2"/>
+      </initial_glyph>
+     </initial>
+     <state name="D_IDLE">
+      <entry>BSP_ledOff();
 QActive_arm((QActive *)me, IDLE_TOUT);</entry>
-     <exit>QActive_disarm((QActive *)me);</exit>
-     <tran trig="Q_TIMEOUT" target="../../2">
-      <tran_glyph conn="6,14,3,1,53">
-       <action box="0,-2,11,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="6,6,19,15">
-      <entry box="1,2,5,2"/>
-      <exit box="1,4,5,2"/>
-     </state_glyph>
-    </state>
-    <state name="SCROLLING">
-     <entry>BSP_ledOn();
+      <exit>QActive_disarm((QActive *)me);</exit>
+      <tran trig="Q_TIMEOUT" target="../../2">
+       <tran_glyph conn="13,23,3,1,52">
+        <action box="0,-2,11,2"/>
+       </tran_glyph>
+      </tran>
+      <tran trig="SWITCH" target="../../../2">
+       <tran_glyph conn="13,20,3,3,-10,34,10">
+        <action box="-7,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="13,15,19,15">
+       <entry box="1,2,5,2"/>
+       <exit box="1,4,5,2"/>
+      </state_glyph>
+     </state>
+     <state name="D_SCROLLING">
+      <entry>BSP_ledOn();
 QActive_arm((QActive *)me, SCROLLING_TOUT);</entry>
-     <exit>QActive_disarm((QActive *)me);</exit>
-     <tran trig="Q_TIMEOUT">
-      <action>bool rsp = BSP_drawPicture();</action>
-      <choice target="../..">
-       <guard>!rsp</guard>
-       <choice_glyph conn="43,17,4,2,4">
-        <action box="1,0,6,2"/>
-       </choice_glyph>
-      </choice>
-      <choice target="../../../1">
-       <guard>else</guard>
-       <choice_glyph conn="43,17,5,3,-37">
-        <action box="1,0,6,2"/>
-       </choice_glyph>
-      </choice>
-      <tran_glyph conn="59,17,1,-1,-16">
-       <action box="-9,-2,11,2"/>
+      <exit>QActive_disarm((QActive *)me);</exit>
+      <tran trig="Q_TIMEOUT">
+       <action>bool rsp = BSP_drawPicture();</action>
+       <choice target="../..">
+        <guard>!rsp</guard>
+        <choice_glyph conn="49,26,4,2,4">
+         <action box="1,1,5,2"/>
+        </choice_glyph>
+       </choice>
+       <choice target="../../../1">
+        <guard>else</guard>
+        <choice_glyph conn="49,26,5,3,-36">
+         <action box="-6,-2,6,2"/>
+        </choice_glyph>
+       </choice>
+       <tran_glyph conn="65,26,1,-1,-16">
+        <action box="-9,-2,11,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="43,15,22,15">
+       <entry box="1,2,5,2"/>
+       <exit box="1,4,5,2"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="11,9,58,23"/>
+    </state>
+    <state name="STOP">
+     <tran trig="SWITCH" target="../../1">
+      <tran_glyph conn="13,47,3,3,-7,-24,5">
+       <action box="-10,0,10,2"/>
       </tran_glyph>
      </tran>
-     <state_glyph node="38,6,21,15">
-      <entry box="1,2,5,2"/>
-      <exit box="1,4,5,2"/>
-     </state_glyph>
+     <state_glyph node="13,34,24,24"/>
     </state>
-    <state_diagram size="67,29"/>
+    <state_diagram size="77,62"/>
    </statechart>
   </class>
   <attribute name="AO_Display" type="QMActive *const" visibility="0x00" properties="0x00"/>
@@ -67,6 +88,11 @@ QActive_arm((QActive *)me, SCROLLING_TOUT);</entry>
 $declare(AOs::Display_ctor)
 
 extern struct DisplayTag AO_Display;
+
+enum DisplaySignals {
+    CAP_RIGHT_SIG = Q_USER_SIG,
+    SWITCH_SIG,
+};
 
 #endif /* __DISPLAY_TEST_H__ */</text>
    </file>
@@ -95,7 +121,7 @@ $define(AOs::Display)</text>
 #include &quot;bsp_.h&quot;        /* Board Support Package (BSP) */
 #include &quot;display_test.h&quot;      /* application interface */
 /*..........................................................................*/
-static QEvt l_displayQueue[1];
+static QEvt l_displayQueue[5];
 
 /* QF_active[] array defines all active object control blocks --------------*/
 QActiveCB const Q_ROM Q_ROM_VAR QF_active[] = {

@@ -33,21 +33,34 @@ typedef struct DisplayTag {
 
 /* protected: */
 static QState Display_initial(Display * const me);
-static QState Display_IDLE  (Display * const me);
-static QState Display_IDLE_e(Display * const me);
-static QState Display_IDLE_x(Display * const me);
-static QMState const Display_IDLE_s = {
+static QState Display_DEMO  (Display * const me);
+static QState Display_DEMO_i(Display * const me);
+static QMState const Display_DEMO_s = {
     (QMState const *)0,
-    Q_STATE_CAST(&Display_IDLE),
-    Q_ACTION_CAST(&Display_IDLE_x)
+    Q_STATE_CAST(&Display_DEMO),
+    Q_ACTION_CAST(0)
 };
-static QState Display_SCROLLING  (Display * const me);
-static QState Display_SCROLLING_e(Display * const me);
-static QState Display_SCROLLING_x(Display * const me);
-static QMState const Display_SCROLLING_s = {
+static QState Display_D_IDLE  (Display * const me);
+static QState Display_D_IDLE_e(Display * const me);
+static QState Display_D_IDLE_x(Display * const me);
+static QMState const Display_D_IDLE_s = {
+    &Display_DEMO_s,
+    Q_STATE_CAST(&Display_D_IDLE),
+    Q_ACTION_CAST(&Display_D_IDLE_x)
+};
+static QState Display_D_SCROLLING  (Display * const me);
+static QState Display_D_SCROLLING_e(Display * const me);
+static QState Display_D_SCROLLING_x(Display * const me);
+static QMState const Display_D_SCROLLING_s = {
+    &Display_DEMO_s,
+    Q_STATE_CAST(&Display_D_SCROLLING),
+    Q_ACTION_CAST(&Display_D_SCROLLING_x)
+};
+static QState Display_STOP  (Display * const me);
+static QMState const Display_STOP_s = {
     (QMState const *)0,
-    Q_STATE_CAST(&Display_SCROLLING),
-    Q_ACTION_CAST(&Display_SCROLLING_x)
+    Q_STATE_CAST(&Display_STOP),
+    Q_ACTION_CAST(0)
 };
 
 
@@ -64,32 +77,102 @@ void Display_ctor(void) {
 /* @(/1/0/0/0) */
 static QState Display_initial(Display * const me) {
     static QActionHandler const act_[] = {
-        Q_ACTION_CAST(&Display_IDLE_e),
+        Q_ACTION_CAST(&Display_DEMO_i),
         Q_ACTION_CAST(0)
     };
-    return QM_INITIAL(&Display_IDLE_s, &act_[0]);
+    return QM_INITIAL(&Display_DEMO_s, &act_[0]);
 }
 /* @(/1/0/0/1) .............................................................*/
-static QState Display_IDLE_e(Display * const me) {
-    BSP_ledOff();
-    QActive_arm((QActive *)me, IDLE_TOUT);
-    return QM_ENTRY(&Display_IDLE_s);
+static QState Display_DEMO_i(Display * const me) {
+    static QActionHandler const act_[] = {
+        Q_ACTION_CAST(&Display_D_IDLE_e),
+        Q_ACTION_CAST(0)
+    };
+    return QM_INITIAL(&Display_D_IDLE_s, &act_[0]);
 }
-static QState Display_IDLE_x(Display * const me) {
-    QActive_disarm((QActive *)me);
-    return QM_EXIT(&Display_IDLE_s);
-}
-static QState Display_IDLE(Display * const me) {
+static QState Display_DEMO(Display * const me) {
     QState status_;
     switch (Q_SIG(me)) {
-        /* @(/1/0/0/1/0) */
+        default: {
+            status_ = QM_SUPER();
+            break;
+        }
+    }
+    return status_;
+}
+/* @(/1/0/0/1/1) ...........................................................*/
+static QState Display_D_IDLE_e(Display * const me) {
+    BSP_ledOff();
+    QActive_arm((QActive *)me, IDLE_TOUT);
+    return QM_ENTRY(&Display_D_IDLE_s);
+}
+static QState Display_D_IDLE_x(Display * const me) {
+    QActive_disarm((QActive *)me);
+    return QM_EXIT(&Display_D_IDLE_s);
+}
+static QState Display_D_IDLE(Display * const me) {
+    QState status_;
+    switch (Q_SIG(me)) {
+        /* @(/1/0/0/1/1/0) */
         case Q_TIMEOUT_SIG: {
             static QActionHandler const act_[] = {
-                Q_ACTION_CAST(&Display_IDLE_x),
-                Q_ACTION_CAST(&Display_SCROLLING_e),
+                Q_ACTION_CAST(&Display_D_IDLE_x),
+                Q_ACTION_CAST(&Display_D_SCROLLING_e),
                 Q_ACTION_CAST(0)
             };
-            status_ = QM_TRAN(&Display_SCROLLING_s, &act_[0]);
+            status_ = QM_TRAN(&Display_D_SCROLLING_s, &act_[0]);
+            break;
+        }
+        /* @(/1/0/0/1/1/1) */
+        case SWITCH_SIG: {
+            static QActionHandler const act_[] = {
+                Q_ACTION_CAST(&Display_D_IDLE_x),
+                Q_ACTION_CAST(0)
+            };
+            status_ = QM_TRAN(&Display_STOP_s, &act_[0]);
+            break;
+        }
+        default: {
+            status_ = QM_SUPER();
+            break;
+        }
+    }
+    return status_;
+}
+/* @(/1/0/0/1/2) ...........................................................*/
+static QState Display_D_SCROLLING_e(Display * const me) {
+    BSP_ledOn();
+    QActive_arm((QActive *)me, SCROLLING_TOUT);
+    return QM_ENTRY(&Display_D_SCROLLING_s);
+}
+static QState Display_D_SCROLLING_x(Display * const me) {
+    QActive_disarm((QActive *)me);
+    return QM_EXIT(&Display_D_SCROLLING_s);
+}
+static QState Display_D_SCROLLING(Display * const me) {
+    QState status_;
+    switch (Q_SIG(me)) {
+        /* @(/1/0/0/1/2/0) */
+        case Q_TIMEOUT_SIG: {
+            bool rsp = BSP_drawPicture();
+            /* @(/1/0/0/1/2/0/0) */
+            if (!rsp) {
+                static QActionHandler const act_[] = {
+                    Q_ACTION_CAST(&Display_D_SCROLLING_x),
+                    Q_ACTION_CAST(&Display_D_SCROLLING_e),
+                    Q_ACTION_CAST(0)
+                };
+                status_ = QM_TRAN(&Display_D_SCROLLING_s, &act_[0]);
+            }
+            /* @(/1/0/0/1/2/0/1) */
+            else {
+                static QActionHandler const act_[] = {
+                    Q_ACTION_CAST(&Display_D_SCROLLING_x),
+                    Q_ACTION_CAST(&Display_D_IDLE_e),
+                    Q_ACTION_CAST(0)
+                };
+                status_ = QM_TRAN(&Display_D_IDLE_s, &act_[0]);
+            }
             break;
         }
         default: {
@@ -100,39 +183,16 @@ static QState Display_IDLE(Display * const me) {
     return status_;
 }
 /* @(/1/0/0/2) .............................................................*/
-static QState Display_SCROLLING_e(Display * const me) {
-    BSP_ledOn();
-    QActive_arm((QActive *)me, SCROLLING_TOUT);
-    return QM_ENTRY(&Display_SCROLLING_s);
-}
-static QState Display_SCROLLING_x(Display * const me) {
-    QActive_disarm((QActive *)me);
-    return QM_EXIT(&Display_SCROLLING_s);
-}
-static QState Display_SCROLLING(Display * const me) {
+static QState Display_STOP(Display * const me) {
     QState status_;
     switch (Q_SIG(me)) {
         /* @(/1/0/0/2/0) */
-        case Q_TIMEOUT_SIG: {
-            bool rsp = BSP_drawPicture();
-            /* @(/1/0/0/2/0/0) */
-            if (!rsp) {
-                static QActionHandler const act_[] = {
-                    Q_ACTION_CAST(&Display_SCROLLING_x),
-                    Q_ACTION_CAST(&Display_SCROLLING_e),
-                    Q_ACTION_CAST(0)
-                };
-                status_ = QM_TRAN(&Display_SCROLLING_s, &act_[0]);
-            }
-            /* @(/1/0/0/2/0/1) */
-            else {
-                static QActionHandler const act_[] = {
-                    Q_ACTION_CAST(&Display_SCROLLING_x),
-                    Q_ACTION_CAST(&Display_IDLE_e),
-                    Q_ACTION_CAST(0)
-                };
-                status_ = QM_TRAN(&Display_IDLE_s, &act_[0]);
-            }
+        case SWITCH_SIG: {
+            static QActionHandler const act_[] = {
+                Q_ACTION_CAST(&Display_DEMO_i),
+                Q_ACTION_CAST(0)
+            };
+            status_ = QM_TRAN(&Display_DEMO_s, &act_[0]);
             break;
         }
         default: {

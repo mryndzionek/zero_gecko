@@ -19,7 +19,7 @@
 #include "bsp_.h"        /* Board Support Package (BSP) */
 #include "display_test.h"      /* application interface */
 /*..........................................................................*/
-static QEvt l_displayQueue[1];
+static QEvt l_displayQueue[5];
 
 /* QF_active[] array defines all active object control blocks --------------*/
 QActiveCB const Q_ROM Q_ROM_VAR QF_active[] = {

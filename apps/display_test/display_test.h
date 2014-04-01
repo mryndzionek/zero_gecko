@@ -25,4 +25,9 @@ void Display_ctor(void);
 
 extern struct DisplayTag AO_Display;
 
+enum DisplaySignals {
+    CAP_RIGHT_SIG = Q_USER_SIG,
+    SWITCH_SIG,
+};
+
 #endif /* __DISPLAY_TEST_H__ */
