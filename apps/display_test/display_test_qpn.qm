@@ -25,7 +25,7 @@ QActive_arm((QActive *)me, IDLE_TOUT);</entry>
        </tran_glyph>
       </tran>
       <tran trig="SWITCH" target="../../../2">
-       <tran_glyph conn="13,20,3,3,-10,34,10">
+       <tran_glyph conn="13,20,3,3,-10,24,10">
         <action box="-7,-2,6,2"/>
        </tran_glyph>
       </tran>
@@ -65,13 +65,13 @@ QActive_arm((QActive *)me, SCROLLING_TOUT);</entry>
     </state>
     <state name="STOP">
      <tran trig="SWITCH" target="../../1">
-      <tran_glyph conn="13,47,3,3,-7,-24,5">
+      <tran_glyph conn="13,40,3,3,-7,-17,5">
        <action box="-10,0,10,2"/>
       </tran_glyph>
      </tran>
-     <state_glyph node="13,34,24,24"/>
+     <state_glyph node="13,34,24,14"/>
     </state>
-    <state_diagram size="77,62"/>
+    <state_diagram size="72,52"/>
    </statechart>
   </class>
   <attribute name="AO_Display" type="QMActive *const" visibility="0x00" properties="0x00"/>

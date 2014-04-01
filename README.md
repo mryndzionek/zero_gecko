@@ -53,6 +53,12 @@ Examples description
 
 ![emlcd](images/emlcd_eap.png?raw=true "Energy aware profiler - emlcd example")
 
+* __QP-nano display demo__
+
+![display_sm](images/display_sm.png?raw=true "Display demo - QM state machine")
+
+![display](images/display_eap.png?raw=true "Energy aware profiler - display demo")
+
 Contact
 -------
 If you have questions, contact Mariusz Ryndzionek at:
