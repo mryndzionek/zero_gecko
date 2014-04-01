@@ -21,8 +21,8 @@
 
 /*Q_DEFINE_THIS_FILE*/
 
-#define SCROLLING_TOUT BSP_TICKS_PER_SEC
-#define IDLE_TOUT BSP_TICKS_PER_SEC
+#define SCROLLING_TOUT 1
+#define IDLE_TOUT 3*BSP_TICKS_PER_SEC
 
 /* Pelican class declaration -----------------------------------------------*/
 /* @(/1/0) .................................................................*/
@@ -102,7 +102,6 @@ static QState Display_IDLE(Display * const me) {
 /* @(/1/0/0/2) .............................................................*/
 static QState Display_SCROLLING_e(Display * const me) {
     BSP_ledOn();
-    BSP_drawPicture();
     QActive_arm((QActive *)me, SCROLLING_TOUT);
     return QM_ENTRY(&Display_SCROLLING_s);
 }
@@ -115,12 +114,25 @@ static QState Display_SCROLLING(Display * const me) {
     switch (Q_SIG(me)) {
         /* @(/1/0/0/2/0) */
         case Q_TIMEOUT_SIG: {
-            static QActionHandler const act_[] = {
-                Q_ACTION_CAST(&Display_SCROLLING_x),
-                Q_ACTION_CAST(&Display_IDLE_e),
-                Q_ACTION_CAST(0)
-            };
-            status_ = QM_TRAN(&Display_IDLE_s, &act_[0]);
+            bool rsp = BSP_drawPicture();
+            /* @(/1/0/0/2/0/0) */
+            if (!rsp) {
+                static QActionHandler const act_[] = {
+                    Q_ACTION_CAST(&Display_SCROLLING_x),
+                    Q_ACTION_CAST(&Display_SCROLLING_e),
+                    Q_ACTION_CAST(0)
+                };
+                status_ = QM_TRAN(&Display_SCROLLING_s, &act_[0]);
+            }
+            /* @(/1/0/0/2/0/1) */
+            else {
+                static QActionHandler const act_[] = {
+                    Q_ACTION_CAST(&Display_SCROLLING_x),
+                    Q_ACTION_CAST(&Display_IDLE_e),
+                    Q_ACTION_CAST(0)
+                };
+                status_ = QM_TRAN(&Display_IDLE_s, &act_[0]);
+            }
             break;
         }
         default: {

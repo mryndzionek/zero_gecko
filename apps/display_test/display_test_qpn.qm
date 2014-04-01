@@ -25,11 +25,23 @@ QActive_arm((QActive *)me, IDLE_TOUT);</entry>
     </state>
     <state name="SCROLLING">
      <entry>BSP_ledOn();
-BSP_drawPicture();
 QActive_arm((QActive *)me, SCROLLING_TOUT);</entry>
      <exit>QActive_disarm((QActive *)me);</exit>
-     <tran trig="Q_TIMEOUT" target="../../1">
-      <tran_glyph conn="59,17,1,3,-53">
+     <tran trig="Q_TIMEOUT">
+      <action>bool rsp = BSP_drawPicture();</action>
+      <choice target="../..">
+       <guard>!rsp</guard>
+       <choice_glyph conn="43,17,4,2,4">
+        <action box="1,0,6,2"/>
+       </choice_glyph>
+      </choice>
+      <choice target="../../../1">
+       <guard>else</guard>
+       <choice_glyph conn="43,17,5,3,-37">
+        <action box="1,0,6,2"/>
+       </choice_glyph>
+      </choice>
+      <tran_glyph conn="59,17,1,-1,-16">
        <action box="-9,-2,11,2"/>
       </tran_glyph>
      </tran>
@@ -65,8 +77,8 @@ extern struct DisplayTag AO_Display;
 
 /*Q_DEFINE_THIS_FILE*/
 
-#define SCROLLING_TOUT BSP_TICKS_PER_SEC
-#define IDLE_TOUT BSP_TICKS_PER_SEC
+#define SCROLLING_TOUT 1
+#define IDLE_TOUT 3*BSP_TICKS_PER_SEC
 
 /* Pelican class declaration -----------------------------------------------*/
 $declare(AOs::Display)

@@ -22,7 +22,7 @@
 
 /* Variables used to display pictures on display */
 static int numImages = sizeof (image_bits) / BYTES_PER_FRAME;
-static int newImage, oldImage  = 0;
+static int newImage = 1, oldImage = 0, step  = 0;
 
 static volatile bool      displayEnabled = false; /* Status of LCD display. */
 static DISPLAY_Device_t displayDevice;    /* Display device handle.         */
@@ -31,15 +31,13 @@ static DISPLAY_Device_t displayDevice;    /* Display device handle.         */
 static void (*rtcCallback)(void*) = 0;
 static void * rtcCallbackArg         = 0;
 
-static void MemlcdScrollLeft(const char *pOldImg, const char *pNewImg)
+static void MemlcdScrollLeft(const char *pOldImg, const char *pNewImg, int step)
 {
-  int step, x, y;
+  int x, y;
   char line[BYTES_PER_LINE];
   const char *pNewLine, *pOldLine;
 
-  /* Iterate over all the steps */
-  for (step = 0; step <= BYTES_PER_LINE; step++)
-  {
+
     /* Iterate over each line */
     for (y = 0; y < LS013B7DH03_HEIGHT; y++)
     {
@@ -64,20 +62,28 @@ static void MemlcdScrollLeft(const char *pOldImg, const char *pNewImg)
                                       0, displayDevice.geometry.width,
                                       /* start row, height */
                                       y, 1 );
-    }
   }
 }
 
-void BSP_drawPicture(void)
+bool BSP_drawPicture(void)
 {
-    /* Output new image on Memory LCD */
-    oldImage = newImage;
+    MemlcdScrollLeft(&image_bits[oldImage*BYTES_PER_FRAME], &image_bits[newImage*BYTES_PER_FRAME], step);
 
-    if (++newImage >= numImages)
-    {
-      newImage = 0;
-    }
-    MemlcdScrollLeft(&image_bits[oldImage*BYTES_PER_FRAME], &image_bits[newImage*BYTES_PER_FRAME]);
+    step+=2;
+    if(step > BYTES_PER_LINE)
+        {
+            /* Output new image on Memory LCD */
+            oldImage = newImage;
+
+            if (++newImage >= numImages)
+                {
+                    newImage = 0;
+                }
+
+            step = 0;
+            return true;
+        } else
+            return false;
 }
 
 /*..........................................................................*/
@@ -157,7 +163,7 @@ void BSP_init(void) {
   }
 
   /* Load pointer to picture buffor */
-  pFrame= (char *) &image_bits[LS013B7DH03_WIDTH * BYTES_PER_LINE * newImage];
+  pFrame= (char *) &image_bits[LS013B7DH03_WIDTH * BYTES_PER_LINE * oldImage];
 
   /* Write to LCD */
   displayDevice.pPixelMatrixDraw( &displayDevice, pFrame,
