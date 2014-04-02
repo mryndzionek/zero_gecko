@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/../qpn_5.2.0/include")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/../qpn_5.2.0/ports/arm-cm/vanilla/gnu/")
 ADD_EFM32_EXECUTABLE(
 	blink_qpn 
 	main.c 
